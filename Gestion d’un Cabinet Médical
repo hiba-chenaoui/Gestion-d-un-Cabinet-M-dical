@@ -1,0 +1,11 @@
+Ce TP consiste à réaliser la première phase du projet Gestion d’un Cabinet Médical. L’objectif principal est de mettre en place une application monolithique Spring Boot permettant d’informatiser les fonctionnalités de base d’un cabinet médical, tout en respectant une architecture en couches.
+
+L’application a été développée sous la forme d’un seul projet Spring Boot, organisé en plusieurs couches : une couche model pour représenter les entités métier, une couche repository pour l’accès aux données à l’aide de Spring Data JPA, une couche service pour la logique métier, et une couche web pour l’exposition des services via des endpoints REST. Cette organisation permet une bonne séparation des responsabilités tout en restant dans une architecture monolithique.
+
+Dans ce TP, les fonctionnalités suivantes ont été implémentées : la gestion des patients avec la possibilité de créer un patient et de consulter la liste des patients, la gestion des médecins avec la création et l’affichage des médecins, la gestion des rendez-vous permettant de planifier un rendez-vous entre un patient et un médecin.
+
+Plusieurs endpoints REST ont été exposés afin de permettre l’interaction avec l’application. Il est possible de créer et lister les patients via /patients, de créer et lister les médecins via /medecins, de créer et lister les rendez-vous via /rendezvous
+
+Les tests ont été réalisés à l’aide de l’outil Postman, permettant de vérifier le bon fonctionnement des opérations de création et de consultation des différentes entités. Des captures d’écran illustrant ces tests sont fournies
+
+En conclusion, ce TP a permis de mettre en place une application monolithique simple, fonctionnelle et bien structurée, servant de base solide pour les prochaines étapes du projet, qui porteront sur l’évolution vers une architecture orientée services puis vers les microservices.
