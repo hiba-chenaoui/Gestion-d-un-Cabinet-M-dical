@@ -28,12 +28,19 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    public Patient getPation(Long id) throws Exception {
-        Optional<Patient> patient = patientRepository.findById(id);
-        if(!patient.isPresent()){
-            throw new Exception("Patient introuvable : id ="+id);
-        }
-        return patient.get();
+    public Patient getPatient(Long id) throws Exception {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new Exception("Patient introuvable : id = " + id));
+    }
+
+    public Patient update(Long id, Patient patientData) throws Exception {
+        Patient patient = getPatient(id);
+        patient.setNom(patientData.getNom());
+        patient.setTelephone(patientData.getTelephone());
+        patient.setDateNaissance(patientData.getDateNaissance());
+        patient.setGenre(patientData.getGenre());
+
+        return patientRepository.save(patient);
     }
 
     public List<Patient> list() {

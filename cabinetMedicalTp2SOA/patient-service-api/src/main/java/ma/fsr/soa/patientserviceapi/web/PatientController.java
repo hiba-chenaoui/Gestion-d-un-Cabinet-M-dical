@@ -19,6 +19,19 @@ public class PatientController {
         return patientService.create(patient);
     }
 
+    @GetMapping("/{id}")
+    public Patient getPatient(@PathVariable Long id) throws Exception {
+        return patientService.getPatient(id);
+    }
+
+
+    @PutMapping("/{id}")
+    public Patient updatePatient(
+            @PathVariable Long id,
+            @RequestBody Patient patient) throws Exception {
+        return patientService.update(id, patient);
+    }
+
     @GetMapping
     public List<Patient> patientList() {
         return patientService.list();

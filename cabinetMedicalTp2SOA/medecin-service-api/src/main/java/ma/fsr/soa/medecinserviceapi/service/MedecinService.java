@@ -34,21 +34,22 @@ public class MedecinService {
 
 
 
-    public Medecin update(Medecin medecin) throws Exception {
-        Optional<Medecin> m = medecinRepository.findById(medecin.getId());
-        if(!m.isPresent()){
-            throw new Exception("Medecin introvable");
-        }
+    public Medecin getMedecin(Long id) throws Exception {
+        return medecinRepository.findById(id)
+                .orElseThrow(() -> new Exception("Médecin introuvable : id = " + id));
+    }
+
+
+    public Medecin update(Long id, Medecin medecinData) throws Exception {
+        Medecin medecin = getMedecin(id);
+
+        medecin.setNom(medecinData.getNom());
+        medecin.setSpecialite(medecinData.getSpecialite());
+        medecin.setEmail(medecinData.getEmail());
+
         return medecinRepository.save(medecin);
     }
 
-    public Medecin getMedecin(Long id) throws Exception {
-        Optional<Medecin> medecin = medecinRepository.findById(id);
-        if(medecin.isEmpty()){
-            throw new Exception("Médecin introuvable : id = " +id);
-        }
-        return medecin.get();
-    }
 
     public List<Medecin> list() {
         return medecinRepository.findAll();
@@ -60,4 +61,6 @@ public class MedecinService {
             medecinRepository.delete(medecin);
         }
     }
+
+
 }

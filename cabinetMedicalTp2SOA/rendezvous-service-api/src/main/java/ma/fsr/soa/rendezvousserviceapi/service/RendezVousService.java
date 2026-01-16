@@ -46,7 +46,55 @@ public class RendezVousService {
         return rendezVousRepository.save(rendezVous);
     }
 
+    public RendezVous getRendezVous(Long id) throws Exception {
+        return rendezVousRepository.findById(id)
+                .orElseThrow(() -> new Exception("Rendez-vous introuvable : id = " + id));
+    }
+
+    public RendezVous update(Long id, LocalDate dateRDV, String statut) throws Exception {
+        RendezVous rdv = getRendezVous(id);
+
+        if (dateRDV.isBefore(LocalDate.now())) {
+            throw new Exception("La date du rendez-vous doit être future.");
+        }
+
+        if (!statut.equals("PLANIFIE") && !statut.equals("ANNULE") && !statut.equals("TERMINE")) {
+            throw new Exception("Statut invalide. Valeurs possibles : PLANIFIE, ANNULE, TERMINE.");
+        }
+        rdv.setStatut(statut);
+
+        return rendezVousRepository.save(rdv);
+    }
+
     public List<RendezVous> list() {
         return rendezVousRepository.findAll();
     }
+
+    public void delete(Long idRdv){
+        RendezVous rdv = rendezVousRepository.findById(idRdv).orElse(null);
+        if (rdv != null) {
+            rendezVousRepository.delete(rdv);
+        }
+    }
+
+    public List<RendezVous> listByPatient(Long idPatient) {
+        return rendezVousRepository.findByPatientId(idPatient);
+    }
+
+    public List<RendezVous> listByMedecin(Long idMedecin) {
+        return rendezVousRepository.findByMedecinId(idMedecin);
+    }
+
+    public RendezVous updateStatut(Long id, String statut) throws Exception {
+        RendezVous rdv = getRendezVous(id);
+
+        if (!statut.equals("PLANIFIE") && !statut.equals("ANNULE") && !statut.equals("TERMINE")) {
+            throw new Exception("Statut invalide. Valeurs possibles : PLANIFIE, ANNULE, TERMINE.");
+        }
+
+        rdv.setStatut(statut);
+        return rendezVousRepository.save(rdv);
+    }
+
+
 }
