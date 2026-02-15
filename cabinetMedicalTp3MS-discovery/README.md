@@ -1,56 +1,77 @@
-# TP3 – Architecture Microservices (REST)
-## Gestion d’un Cabinet Médical
+# Consultation Service
 
-Cours assuré par : **Jaouad OUHSSAINE**  
-Contact : jaouad.ouhs@gmail.com | jaouad_ouhssaine@um5.ac.ma
+## C'est quoi ?
 
----
+Un service pour enregistrer les consultations médicales après un rendez-vous. Le médecin note ce qui s'est passé pendant la consultation : symptômes, diagnostic, traitement, etc.
 
-## Contexte
+## Les règles importantes
 
-Ce TP correspond à la **troisième phase** du projet pédagogique évolutif  
-**Gestion d’un Cabinet Médical**.
+Avant d'enregistrer une consultation, le service vérifie 4 choses :
 
-Il consiste à **faire évoluer l’architecture SOA du TP2** vers une  
-**architecture microservices REST**, basée sur des microservices **totalement autonomes**, chacun disposant de sa **propre API** et de sa **propre base de données**, avec un **API Gateway** comme point d’entrée unique.
+**1. Le rendez-vous doit exister**  
+On ne peut pas créer une consultation pour un rendez-vous qui n'existe pas.  
+*Erreur : "Rendez-vous introuvable."*
 
----
+**2. La date est obligatoire**  
+Il faut préciser quand la consultation a eu lieu.  
+*Erreur : "La date de consultation est obligatoire."*
 
-## Objectifs du TP
+**3. La consultation se passe après le rendez-vous**  
+On ne peut pas faire une consultation avant que le patient soit venu.  
+*Erreur : "Date de consultation invalide."*
 
-- Mettre en place une architecture **microservices**
-- Découpler totalement les services (code et données)
-- Supprimer tout module de persistance partagé
-- Introduire un **API Gateway** pour l’exposition des APIs
-- Mettre en œuvre la communication **REST inter-services**
-- Comprendre la différence entre **SOA et Microservices**
+**4. Le rapport doit être complet**  
+Minimum 10 caractères. "OK" ne suffit pas.  
+*Erreur : "Rapport de consultation insuffisant."*
 
----
+## Configuration
 
-## Architecture globale
+Le service tourne sur le **port 8085** et s'appelle `consultation-service`.
 
-L’architecture est basée sur :
-- Des **microservices métiers autonomes** (Patient, Médecin, Rendez-vous, Consultation)
-- Un **service composite** pour l’agrégation des données (Dossier Patient)
-- Un **API Gateway** servant de point d’entrée unique pour les clients externes
-- Une **base de données par microservice**
+Base de données H2 en mémoire : `consultationDB`  
+Console H2 disponible sur : `http://localhost:8085/h2-console`  
+Enregistrement Eureka : `http://localhost:8761/eureka`
 
-Les clients n’accèdent jamais directement aux microservices, toutes les requêtes passent par le Gateway.
+## Actions disponibles
 
----
+Tous les appels commencent par `/internal/api/v1/consultations`
 
-## Structure du projet
+**Créer une consultation** - POST /  
+**Lister toutes les consultations** - GET /  
+**Voir une consultation** - GET /{id}  
+**Consultations d'un rendez-vous** - GET /rendezvous/{id}  
+**Modifier une consultation** - PUT /{id}  
+**Supprimer une consultation** - DELETE /{id}
 
-```text
-cabinetMedicalTp3MS/
-│
-├── api-gateway                  # API Gateway (point d’entrée externe)
-│
-├── patient-service              # Microservice Patient (API + DB)
-├── medecin-service              # Microservice Médecin (API + DB)
-├── rendezvous-service           # Microservice Rendez-vous (API + DB)
-├── consultation-service         # Microservice Consultation (API + DB)
-│
-├── dossier-service              # Service composite (agrégation REST)
-│
-└── pom.xml                      # Projet parent (packaging pom)
+## Comment ça communique ?
+
+Le service parle avec le **service rendez-vous** pour :
+- Vérifier que le rendez-vous existe
+- Récupérer la date du rendez-vous
+
+Toute la communication passe par l'**API Gateway**. Le service utilise **RestTemplate avec LoadBalancing** pour trouver automatiquement les autres services via Eureka.
+
+## Structure du code
+
+**client/** - Communication avec les autres services  
+**exception/** - Gestion des erreurs  
+**model/** - Entité Consultation  
+**repository/** - Sauvegarde en base de données  
+**service/** - Logique métier et validation des règles  
+**web/** - API REST avec les 6 endpoints
+
+## Démarrage
+
+Ordre important :
+
+1. Eureka Server (port 8761)
+2. API Gateway (port 8080)
+3. Patient Service (port 8082)
+4. Medecin Service (port 8083)
+5. Rendez-vous Service (port 8084)
+6. **Consultation Service (port 8085)**
+
+
+## En résumé
+
+Un service qui vérifie les 4 règles métier avant de sauvegarder une consultation. Il communique avec le service rendez-vous via l'API Gateway et s'enregistre automatiquement dans Eureka.
