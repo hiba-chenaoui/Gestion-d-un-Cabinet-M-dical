@@ -18,6 +18,17 @@ public class MedecinController {
         return medecinService.create(medecin);
     }
 
+    @GetMapping("/{id}")
+    public Medecin getMedecin(@PathVariable Long id) throws Exception {
+        return medecinService.getMedecin(id);
+    }
+
+    // UPDATE
+    @PutMapping("/{id}")
+    public Medecin updateMedecin(@PathVariable Long id, @RequestBody Medecin medecin) throws Exception {
+        return medecinService.update(id, medecin);
+    }
+
     @GetMapping
     public List<Medecin> list() {
         return medecinService.list();
